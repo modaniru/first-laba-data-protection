@@ -6,19 +6,27 @@ import (
 	"os"
 )
 
-var myVar map[int]int = map[int]int{1: 2, 2: 6, 3: 3, 4: 5, 5: 1, 6: 4}
+var myVar map[int]int = map[int]int{1: 5, 2: 1, 3: 3, 4: 6, 5: 4, 6: 2}
 
 func main(){
 	// scan user input
 	in := bufio.NewReader(os.Stdin)
-	line, _ := in.ReadString('\n')
-	// remove \n symbol
-	line = line[:len(line) -1]
-	// code user input
-	coded := code(line, myVar)
-	// decode user input
-	decoded := decode(coded, myVar)
-	fmt.Printf("RESULT\n------\ninput:  '%s'\ncode:   '%s'\ndecode: '%s'", line, coded, decoded)
+	fmt.Println("q - выход")
+	for {
+		fmt.Print("Ввод -> ")
+		line, _ := in.ReadString('\n')
+		if line == "q\n"{
+			break
+		}
+		// remove \n symbol
+		line = line[:len(line) -1]
+		// code user input
+		coded := code(line, myVar)
+		// decode user input
+		decoded := decode(coded, myVar)
+		fmt.Printf("RESULT\n------\ninput:  '%s'\ncode:   '%s'\ndecode: '%s'\n", line, coded, decoded)
+	}
+	fmt.Println("Выход")
 }
 
 //Code string with input permutation group
