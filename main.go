@@ -4,11 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 )
 
-var mapa map[int]int = map[int]int{1: 2, 2: 6, 3: 3, 4:5, 5:1, 6:4}
-var decodeMapa map[int]int = map[int]int{1: 5, 2: 1, 3: 3, 4: 6, 5: 4, 6: 2}
+var myVar map[int]int = map[int]int{1: 2, 2: 6, 3: 3, 4: 5, 5: 1, 6: 4}
 
 func main(){
 	// scan user input
@@ -17,65 +15,63 @@ func main(){
 	// remove \n symbol
 	line = line[:len(line) -1]
 	// code user input
-	coded := code(line)
+	coded := code(line, myVar)
 	// decode user input
-	decoded := decode(coded)
-	fmt.Printf("RESULT\n------\ninput: '%s'\ncode: '%s'\ndecode: '%s'", line, coded, decoded)
+	decoded := decode(coded, myVar)
+	fmt.Printf("RESULT\n------\ninput:  '%s'\ncode:   '%s'\ndecode: '%s'", line, coded, decoded)
 }
 
-func code(line string) string{
-	i := 0
+//Code string with input permutation group
+func code(line string, mapa map[int]int) string{
+	// tirm last line's spaces
+	end := TrimLastSpaces(line)
+	// init slice of runes for better optimization
+	lineRunes := []rune(line[:end+1])
+	// add spaces for len(line) % 6 == 0
+	for len(lineRunes) % 6 != 0{
+		lineRunes = append(lineRunes, ' ')
+	}
+	// slice of runes for optimization
 	coded := make([]rune, 0)
-	end := len(line) - 1
-	for line[end] == ' '{
+	for i := 0; i < end; i+=len(mapa){
+		// get line's segment with mapa's len
+		segment := lineRunes[i:i+len(mapa)]
+		// slice contains coded segment
+		codedPart := make([]rune, len(mapa))
+		for i, r := range segment{
+			// set runes according to the table
+			codedPart[mapa[i+1] - 1] = r
+		}
+		coded = append(coded, codedPart...)
+	}
+	// trim last spaces
+	res := string(coded)
+	end = TrimLastSpaces(res)
+	return res[:end + 1]
+}
+
+//Decode string with input permutation group
+func decode(line string, mapa map[int]int) string{
+	// reverse mapa
+	mapa = reverseMap(mapa)
+	// and invoke code function with reverse mapa
+	return code(line, mapa)
+}
+
+//Trim last spaces
+func TrimLastSpaces(s string) int{
+	end := len(s) - 1
+	for s[end] == ' '{
 		end--
 	}
-	for i = 0; i < end - len(mapa) - 1; i+=len(mapa){
-		segment := line[i:i+len(mapa)]
-		codedPart := make([]rune, len(mapa))
-		for i, r := range segment{
-			codedPart[mapa[i+1] - 1] = r
-		}
-		coded = append(coded, codedPart...)
-	}
-	if i <= end{
-		segment := line[i:end + 1]
-		codedPart := make([]rune, len(mapa))
-		for i := range codedPart{
-			codedPart[i] = ' '
-		}
-		for i, r := range segment{
-			codedPart[mapa[i+1] - 1] = r
-		}
-		coded = append(coded, codedPart...)
-	}
-	return string(coded)
+	return end
 }
 
-
-func decode(line string) string{
-	i := 0
-	coded := make([]rune, 0)
-	end := len(line) - 1
-	for i = 0; i < end - len(mapa) - 1; i+=len(mapa){
-		segment := line[i:i+6]
-		codedPart := make([]rune, len(decodeMapa))
-		for i, r := range segment{
-			codedPart[decodeMapa[i+1] - 1] = r
-		}
-		coded = append(coded, codedPart...)
+//Reverse map[int]int
+func reverseMap(mapa map[int]int) map[int]int{
+	res := make(map[int]int)
+	for k, v := range mapa{
+		res[v] = k
 	}
-	if i <= end{
-		segment := line[i:end + 1]
-		codedPart := make([]rune, len(decodeMapa))
-		for i := range codedPart{
-			codedPart[i] = ' '
-		}
-		for i, r := range segment{
-			codedPart[decodeMapa[i+1] - 1] = r
-		}
-		coded = append(coded, codedPart...)
-	}
-	res := strings.TrimSpace(string(coded))
 	return res
 }
