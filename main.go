@@ -13,7 +13,7 @@ func main(){
 	in := bufio.NewReader(os.Stdin)
 	fmt.Println("q - выход")
 	for {
-		fmt.Print("Ввод -> ")
+		fmt.Print("\nВвод -> ")
 		line, _ := in.ReadString('\n')
 		if line == "q\n"{
 			break
@@ -35,13 +35,13 @@ func code(line string, mapa map[int]int) string{
 	end := TrimLastSpaces(line)
 	// init slice of runes for better optimization
 	lineRunes := []rune(line[:end+1])
-	// add spaces for len(line) % 6 == 0
-	for len(lineRunes) % 6 != 0{
+	// add spaces for len(line) % len(mapa) == 0
+	for len(lineRunes) % len(mapa) != 0{
 		lineRunes = append(lineRunes, ' ')
 	}
 	// slice of runes for optimization
 	coded := make([]rune, 0)
-	for i := 0; i < end; i+=len(mapa){
+	for i := 0; i < len(lineRunes); i+=len(mapa){
 		// get line's segment with mapa's len
 		segment := lineRunes[i:i+len(mapa)]
 		// slice contains coded segment
